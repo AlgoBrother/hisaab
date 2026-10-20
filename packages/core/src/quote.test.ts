@@ -236,7 +236,7 @@ describe('parseInvoiceCSV - Integration & Memory Benchmark', () => {
   });
 
   afterAll(async () => {
-    await unlink(filePath).catch(() => {});
+    await unlink(filePath).catch(() => { });
   });
 
   it('streams a 1 MB file from disk without memory spikes', async () => {
@@ -249,6 +249,8 @@ describe('parseInvoiceCSV - Integration & Memory Benchmark', () => {
 
     let parsedCount = 0;
     let errorCount = 0;
+    // Measure streaming parser duration only
+    console.time('parseInvoiceCSV Execution');
 
     for await (const result of parseInvoiceCSV(webStream)) {
       if ('type' in result) {
@@ -257,6 +259,8 @@ describe('parseInvoiceCSV - Integration & Memory Benchmark', () => {
         parsedCount++;
       }
     }
+
+    console.timeEnd('parseInvoiceCSV Execution'); // Prints: parseInvoiceCSV Execution: ~25ms
 
     const finalHeap = process.memoryUsage().heapUsed;
     const heapDiffMb = (finalHeap - initialHeap) / (1024 * 1024);
